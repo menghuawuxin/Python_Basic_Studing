@@ -19,23 +19,37 @@ def login(username, password, data):
     '''
     flag = False
     data_name = data.keys()
-    for i in data_name:
-        if username == i:
-            flag = True
+    while not flag:
+        for i in data_name:
+            if username == i:
+                flag = True
+        if not flag:
+            username = input("无此用户，请重新输入：")
     if flag and data[username][0] == password:
-        return "0"
+        print("欢迎登陆")
+        sys.exit()
     else:
+        for i in range(3):
+            password = input("密码错误，请重新输入：")
+            if data[username][0] == password:
+                print("欢迎登陆")
+                sys.exit()
+            else:
+                continue
+        locking(username)
+        username = input("密码多次错误，该用户被锁定，请重新输入用户名：")
+        password = input("请重新输入密码：")
+        login(username, password, data)
         return flag
 
-def login_again(params, data):
+def locking(username):
     pass
+
+
 
 if __name__ == '__main__':
     data = get_login_information()
     get_name = input("请输入用户名；")
     get_password = input("请输入密码：")
     get_login_data = login(get_name, get_password, data)
-    if get_login_data == "0":
-        print("成功登陆")
-    else:
-        print("登陆失败")
+
