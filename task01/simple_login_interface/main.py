@@ -10,6 +10,7 @@ def get_login_information():
     deal_data = get_data.groupby("username")["password"].apply(list).to_dict()
     return deal_data
 
+
 def login(username, password, data):
     '''
     判断输入的用户名密码是否正确
@@ -17,6 +18,13 @@ def login(username, password, data):
     :param password:
     :return:
     '''
+
+    locked_sige = get_locking_name(username)
+    while locked_sige:
+        print("该用户已锁定")
+        username = input("请重新输入用户名：")
+        password = input("请重新输入密码：")
+        locked_sige = get_locking_name(username)
     flag = False
     data_name = data.keys()
     while not flag:
@@ -24,7 +32,8 @@ def login(username, password, data):
             if username == i:
                 flag = True
         if not flag:
-            username = input("无此用户，请重新输入：")
+            username = input("无此用户，请重新输入用户名：")
+            password = input("请重新输入密码：")
     if flag and data[username][0] == password:
         print("欢迎登陆")
         sys.exit()
@@ -38,13 +47,24 @@ def login(username, password, data):
                 continue
         locking(username)
         username = input("密码多次错误，该用户被锁定，请重新输入用户名：")
-        password = input("请重新输入密码：")
+        password = input("请输入密码：")
         login(username, password, data)
         return flag
 
-def locking(username):
-    pass
 
+def locking(username):
+    with open("locking_user", mode='a+', encoding="utf-8") as w:
+        w.write("\n" + username)
+    return None
+
+
+def get_locking_name(username):
+    locking_name = open("locking_user", mode='r', encoding="utf-8").read().split("\n")
+    flag = False
+    for locked_name in locking_name:
+        if username == locked_name:
+            flag = True
+    return flag
 
 
 if __name__ == '__main__':
@@ -52,4 +72,3 @@ if __name__ == '__main__':
     get_name = input("请输入用户名；")
     get_password = input("请输入密码：")
     get_login_data = login(get_name, get_password, data)
-
